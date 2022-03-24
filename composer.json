@@ -1,0 +1,14 @@
+{
+    "name": "jackwestin/anki-sandbox",
+    "type": "library",
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jackwestin\\AnkiSandbox\\": "src/"
+        }
+    },
+    "require": {}
+}
