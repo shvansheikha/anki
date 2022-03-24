@@ -3,8 +3,8 @@ This is the sandbox package to implement Anki algorithms and importer/exporter t
 
 ## Tasks
 - [ ] Implement Anki data flow.
-- [ ] Implement Spaced Repetition.
-- [ ] Implement Ease Factor.
+- [ ] Implement ‍`Spaced Repetition`.
+- [ ] Implement `Ease Factor`.
 
 ## Note
 - Project should have Test and should be developer TDD
