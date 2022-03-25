@@ -2,6 +2,9 @@
   "name": "jackwestin/anki-sandbox",
   "type": "library",
   "minimum-stability": "dev",
+  "require": {
+    "ext-json": "*"
+  },
   "require-dev": {
     "phpunit/phpunit": "^9.5"
   },
@@ -10,8 +13,9 @@
       "Jackwestin\\AnkiSandbox\\": "src/"
     }
   },
-  "require": {
-    "symfony/console": "6.1.x-dev",
-    "ext-json": "*"
+  "autoload-dev": {
+    "psr-4": {
+      "Jackwestin\\AnkiSandbox\\Tests\\": "tests/"
+    }
   }
 }
