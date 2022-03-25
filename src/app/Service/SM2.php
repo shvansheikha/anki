@@ -2,17 +2,18 @@
 
 namespace Jackwestin\AnkiSandbox\app\Service;
 
+use Jackwestin\AnkiSandbox\app\Utilities\Settings;
+
 class SM2
 {
-    public function cardAnswer($card, $answer)
+    public function cardAnswer($card, $answer): array
     {
-        $defaultStartingEase = 250;
         $repeat = 0;
 
         if ($card['new']) {
             $learnInterval = ['again' => 60, 'hard' => 360, 'good' => 600, 'easy' => 345600];
             $newInterval = $learnInterval[$answer];
-            $newEase = $defaultStartingEase;
+            $newEase = Settings::$DEFAULT_STARTING_EASE;
 
             if ($answer == "good") {
                 $repeat = 1;
@@ -35,11 +36,8 @@ class SM2
         return [$card, $answer, $newInterval, $newEase, $repeat];
     }
 
-    private function calculate($card, $answer)
+    private function calculate($card, $answer): array
     {
-        $hardEase = 1.2;
-        $defaultEasyBonus = 1.3;
-
         $currentInterval = $card['interval'];
         $currentEase = $card['ease'];
         $repeat = $card['repeat'];
@@ -47,10 +45,10 @@ class SM2
         switch ($answer) {
             case "again":
                 $newInterval = $currentInterval % 2;
-                $newEase = $currentEase - 20;
+                $newEase = $currentEase - Settings::$AGAIN_EASE;
                 break;
             case "hard":
-                $newInterval = $currentInterval * $hardEase * 1;
+                $newInterval = $currentInterval * Settings::$HARD_EASE * 1;
                 $newEase = $currentEase - 15;
                 break;
             case "good":
@@ -59,8 +57,8 @@ class SM2
                 $repeat++;
                 break;
             case "easy":
-                $newInterval = $currentInterval * $currentEase * 1 * $defaultEasyBonus;
-                $newEase = $currentEase + 15;
+                $newInterval = $currentInterval * $currentEase * 1 * Settings::$DEFAULT_EASY_BONUS;
+                $newEase = $currentEase + Settings::$EASY_EASE;
                 $repeat++;
                 break;
             default:
