@@ -32,10 +32,12 @@ class AnkiCommand extends Command
         while ($this->hasCard()) {
 
             $data = array_filter($this->data, function ($object) use ($output) {
-                return in_array($object['answer'], ['again', 'hard', 'good']);
+                return in_array($object['answer'], ['again', 'hard']) ||
+                    ($object['answer'] == "good" && $object['interval'] == 600);
             });
 
             if (count($data) == 0) {
+                $output->writeln('empty');
                 break;
             }
 
@@ -47,6 +49,8 @@ class AnkiCommand extends Command
 
             $this->printInfo($output);
         }
+
+        $this->printList($output);
 
         $this->resetData();
 
@@ -65,6 +69,8 @@ class AnkiCommand extends Command
 
         if ($card['new']) {
             $output->writeln("again = 1m , hard = 6m , good = 10m , easy = 4d");
+        } elseif ($card['repeat'] == 1) {
+            $output->writeln("again = 1m , hard = 10m , good = 1d , easy = 4d");
         }
 
         return $helper->ask($input, $output, $question);
@@ -73,14 +79,27 @@ class AnkiCommand extends Command
     private function saveAnswer($card, $answer)
     {
         $defaultStartingEase = 2.5;
+        $repeat = 0;
 
         if ($card['new']) {
             $learnInterval = ['again' => 60, 'hard' => 360, 'good' => 600, 'easy' => 345600];
             $newInterval = $learnInterval[$answer];
             $newEase = $defaultStartingEase;
-            $repeat = 1;
+
+            if ($answer == "good") {
+                $repeat = 1;
+            }
+
+            if ($answer == "easy") {
+                $repeat = 2;
+            }
+
+        } elseif ($card['repeat'] == 1) {
+            $learnInterval = ['again' => 60, 'hard' => 600, 'good' => 86400, 'easy' => 345600];
+            $newInterval = $learnInterval[$answer];
+            $newEase = $defaultStartingEase;
         } else {
-            list($newInterval, $newEase) = $this->calculate($card, $answer);
+            list($newInterval, $newEase, $repeat) = $this->calculate($card, $answer);
         }
 
         foreach ($this->data as $key => $entry) {
@@ -101,7 +120,6 @@ class AnkiCommand extends Command
     private function calculate($card, $answer)
     {
         $hardEase = 1.2;
-        $defaultIntervalModifier = 1;
         $defaultEasyBonus = 1.3;
 
         $currentInterval = $card['interval'];
@@ -115,16 +133,16 @@ class AnkiCommand extends Command
                 $repeat--;
                 break;
             case "hard":
-                $newInterval = $currentInterval * $hardEase * $defaultIntervalModifier;
+                $newInterval = $currentInterval * $hardEase * 1;
                 $newEase = $currentEase - 15;
                 break;
             case "good":
-                $newInterval = $currentInterval * $currentEase * $defaultIntervalModifier;
+                $newInterval = $currentInterval * $currentEase * 1;
                 $newEase = $currentEase;
                 $repeat++;
                 break;
             case "easy":
-                $newInterval = $currentInterval * $currentEase * $defaultIntervalModifier * $defaultEasyBonus;
+                $newInterval = $currentInterval * $currentEase * 1 * $defaultEasyBonus;
                 $newEase = $currentEase + 15;
                 $repeat++;
                 break;
@@ -154,10 +172,26 @@ class AnkiCommand extends Command
         });
 
         $review = array_filter($this->data, function ($object) use ($output) {
-            return ($object['new'] == false) && in_array($object['answer'], ['again', 'hard', 'good']);
+            return ($object['new'] == false) &&
+                (in_array($object['answer'], ['again', 'hard'])
+                    ||
+                    ($object['answer'] == "good" && $object['interval'] == 600)
+                );
         });
 
         $output->writeln('new = ' . count($new) . ' review = ' . count($review));
+    }
+
+    private function printList(OutputInterface $output)
+    {
+        foreach ($this->data as $card) {
+            $output->writeln(
+                'id = ' . $card['id']
+                . '     title = ' . $card['title']
+                . '     interval = ' . $card['interval']
+                . '     ease = ' . $card['ease']
+            );
+        }
     }
 
     private function resetData()
@@ -167,6 +201,7 @@ class AnkiCommand extends Command
             $this->data[$key]['new'] = true;
             $this->data[$key]['interval'] = 0;
             $this->data[$key]['ease'] = 0;
+            $this->data[$key]['repeat'] = 0;
 
             $this->jsonManage->saveJson($this->data);
         }
