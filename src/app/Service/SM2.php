@@ -74,6 +74,7 @@ class SM2
                 break;
         }
 
+        $newEase = $newEase < 130 ? 130 : $newEase; // should not fall below the value of 1.3
         return [$newInterval, $newEase, $step];
     }
 

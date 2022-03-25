@@ -99,7 +99,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'hard');
 
-        $ivl = ;
+        $ivl = $this->interval['1d'] * (Settings::$HARD_EASE / 100) * 1;
         $this->assertEquals($ivl, $card['interval']);
         $this->assertEquals(2, $card['step']);
         $this->assertEquals($ease - 15, $card['ease']);
