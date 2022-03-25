@@ -71,7 +71,7 @@ class AnkiTest extends TestCase
     /** @test */
     public function it_can_update_step_after_three_time()
     {
-        $card = $this->makeCard(false, $this->interval['1d'], 2, 250);
+        $card = $this->makeCard(false, $this->interval['1d'], 2, Settings::$DEFAULT_STARTING_EASE);
 
         $card = $this->sm2->cardAnswer($card, "easy");
 
@@ -81,7 +81,7 @@ class AnkiTest extends TestCase
     /** @test */
     public function it_can_calculate_interval_for_again_after_2_step()
     {
-        $ease = 250;
+        $ease = Settings::$DEFAULT_STARTING_EASE;
         $card = $this->makeCard(false, $this->interval['1d'], 2, $ease);
 
         $card = $this->sm2->cardAnswer($card, 'again');
@@ -94,40 +94,15 @@ class AnkiTest extends TestCase
     /** @test */
     public function it_can_calculate_interval_for_hard_after_2_step()
     {
-        $ease = 250;
+        $ease = Settings::$DEFAULT_STARTING_EASE;
         $card = $this->makeCard(false, $this->interval['1d'], 2, $ease);
 
         $card = $this->sm2->cardAnswer($card, 'hard');
 
-        $ivl = $this->interval['1d'] / 2;
+        $ivl = ;
         $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals(1, $card['step']);
-        $this->assertEquals($ease - Settings::$HARD_EASE, $card['ease']);
+        $this->assertEquals(2, $card['step']);
+        $this->assertEquals($ease - 15, $card['ease']);
     }
 
-    /** @test */
-    public function it_can_calculate_interval_for_good_after_2_step()
-    {
-        $ease = 250;
-        $card = $this->makeCard(false, $this->interval['1d'], 2, $ease);
-
-        $card = $this->sm2->cardAnswer($card, 'good');
-
-        $ivl = $this->interval['1d'] / 2;
-        $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals($ease - Settings::$AGAIN_EASE, $card['ease']);
-    }
-
-    /** @test */
-    public function it_can_calculate_interval_for_easy_after_2_step()
-    {
-        $ease = 250;
-        $card = $this->makeCard(false, $this->interval['1d'], 2, $ease);
-
-        $card = $this->sm2->cardAnswer($card, 'easy');
-
-        $ivl = $this->interval['1d'] / 2;
-        $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals($ease - Settings::$AGAIN_EASE, $card['ease']);
-    }
 }

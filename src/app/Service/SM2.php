@@ -8,7 +8,7 @@ class SM2
 {
     public function cardAnswer($card, $answer)
     {
-        $step = 0;
+        $step = $card['step'];
 
         if ($this->isFirstStep($card)) {
 
@@ -26,6 +26,10 @@ class SM2
         } elseif ($this->isSecondStep($card['step'])) {
             $newInterval = Settings::$SECOND_STEP_INTERVAL[$answer];
             $newEase = $card['ease'];
+
+            if (in_array($answer, ['good', 'easy'])) {
+                $step++;
+            }
         } else {
             list($newInterval, $newEase, $step) = $this->calculate($card, $answer);
         }
@@ -51,16 +55,16 @@ class SM2
                 $step--;
                 break;
             case "hard":
-                $newInterval = $currentInterval * Settings::$HARD_EASE * 1;
+                $newInterval = $currentInterval * (Settings::$HARD_EASE / 100) * 1;
                 $newEase = $currentEase - 15;
                 break;
             case "good":
-                $newInterval = $currentInterval * $currentEase * 1;
+                $newInterval = $currentInterval * ($currentEase / 100) * 1;
                 $newEase = $currentEase;
                 $step++;
                 break;
             case "easy":
-                $newInterval = $currentInterval * $currentEase * 1 * Settings::$DEFAULT_EASY_BONUS;
+                $newInterval = $currentInterval * ($currentEase / 100) * 1 * (Settings::$DEFAULT_EASY_BONUS / 100);
                 $newEase = $currentEase + Settings::$EASY_EASE;
                 $step++;
                 break;
@@ -78,8 +82,8 @@ class SM2
         return $card['new'] || ($card['step'] == 0);
     }
 
-    private function isSecondStep($step1): bool
+    private function isSecondStep($step): bool
     {
-        return $step1 == 1;
+        return $step == 1;
     }
 }
