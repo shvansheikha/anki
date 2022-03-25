@@ -6,9 +6,9 @@ use Jackwestin\AnkiSandbox\app\Utilities\Settings;
 
 class SM2
 {
-    public function cardAnswer($card, $answer): array
+    public function cardAnswer($card, $answer)
     {
-        $repeat = 0;
+        $step = 0;
 
         if ($card['new']) {
             $learnInterval = ['again' => 60, 'hard' => 360, 'good' => 600, 'easy' => 345600];
@@ -16,31 +16,34 @@ class SM2
             $newEase = Settings::$DEFAULT_STARTING_EASE;
 
             if ($answer == "good") {
-                $repeat = 1;
+                $step = 1;
             }
 
             if ($answer == "easy") {
-                $repeat = 2;
+                $step = 2;
             }
 
-        } elseif ($card['repeat'] == 1) {
+        } elseif ($card['step'] == 1) {
             $learnInterval = ['again' => 60, 'hard' => 600, 'good' => 86400, 'easy' => 345600];
             $newInterval = $learnInterval[$answer];
             $newEase = $card['ease'];
         } else {
-            list($newInterval, $newEase, $repeat) = $this->calculate($card, $answer);
+            list($newInterval, $newEase, $step) = $this->calculate($card, $answer);
         }
 
         $card['new'] = false;
+        $card['interval'] = $newInterval;
+        $card['ease'] = $newEase;
+        $card['step'] = $step;
 
-        return [$card, $answer, $newInterval, $newEase, $repeat];
+        return $card;
     }
 
     private function calculate($card, $answer): array
     {
         $currentInterval = $card['interval'];
         $currentEase = $card['ease'];
-        $repeat = $card['repeat'];
+        $step = $card['step'];
 
         switch ($answer) {
             case "again":
@@ -54,12 +57,12 @@ class SM2
             case "good":
                 $newInterval = $currentInterval * $currentEase * 1;
                 $newEase = $currentEase;
-                $repeat++;
+                $step++;
                 break;
             case "easy":
                 $newInterval = $currentInterval * $currentEase * 1 * Settings::$DEFAULT_EASY_BONUS;
                 $newEase = $currentEase + Settings::$EASY_EASE;
-                $repeat++;
+                $step++;
                 break;
             default:
                 $newInterval = 0;
@@ -67,6 +70,6 @@ class SM2
                 break;
         }
 
-        return [$newInterval, $newEase, $repeat];
+        return [$newInterval, $newEase, $step];
     }
 }
