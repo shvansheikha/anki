@@ -3,20 +3,29 @@
 namespace Jackwestin\AnkiSandbox\Tests\Unit;
 
 use Jackwestin\AnkiSandbox\app\Service\SM2;
+use Jackwestin\AnkiSandbox\app\Utilities\Settings;
 use PHPUnit\Framework\TestCase;
 
 class AnkiTest extends TestCase
 {
     private $sm2;
 
+    private $interval = [
+        '1m' => 60,
+        '6m' => 360,
+        '10m' => 600,
+        '1d' => 86400,
+        '4d' => 345600,
+    ];
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->sm2= new SM2();
+        $this->sm2 = new SM2();
     }
 
-    private function makeCard($new = true, $ease = 0, $interval = 0, $repeat = 0)
+    private function makeCard($new = true, $interval = 0, $step = 0, $ease = 0)
     {
         return [
             "id" => 1,
@@ -25,7 +34,7 @@ class AnkiTest extends TestCase
             "new" => $new,
             "ease" => $ease,
             "interval" => $interval,
-            "repeat" => $repeat
+            "step" => $step
         ];
     }
 
@@ -57,5 +66,28 @@ class AnkiTest extends TestCase
         $card = $this->sm2->cardAnswer($card, "easy");
 
         $this->assertEquals($card['step'], 2);
+    }
+
+    /** @test */
+    public function it_can_update_step_after_three_time()
+    {
+        $card = $this->makeCard(false, $this->interval['1d'], 2, 250);
+
+        $card = $this->sm2->cardAnswer($card, "easy");
+
+        $this->assertEquals($card['step'], 3);
+    }
+
+    /** @test */
+    public function it_can_calculate_interval_for_again_after_2_step()
+    {
+        $ease = 250;
+        $card = $this->makeCard(false, $this->interval['1d'], 2, $ease);
+
+        $card = $this->sm2->cardAnswer($card, 'again');
+
+        $ivl = $this->interval['1d'] / 2;
+        $this->assertEquals($ivl, $card['interval']);
+        $this->assertEquals($ease - Settings::$AGAIN_EASE, $card['ease']);
     }
 }

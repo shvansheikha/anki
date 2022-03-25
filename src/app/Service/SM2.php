@@ -47,7 +47,7 @@ class SM2
 
         switch ($answer) {
             case "again":
-                $newInterval = $currentInterval % 2;
+                $newInterval = $currentInterval / 2;
                 $newEase = $currentEase - Settings::$AGAIN_EASE;
                 break;
             case "hard":
