@@ -105,4 +105,17 @@ class AnkiTest extends TestCase
         $this->assertEquals($ease - 15, $card['ease']);
     }
 
+    /** @test */
+    public function it_can_calculate_interval_for_good_after_2_step()
+    {
+        $ease = Settings::$DEFAULT_STARTING_EASE;
+        $card = $this->makeCard(false, $this->interval['1d'], 2, $ease);
+
+        $card = $this->sm2->cardAnswer($card, 'good');
+
+        $ivl = $this->interval['1d'] * ($ease / 100) * 1;
+        $this->assertEquals($ivl, $card['interval']);
+        $this->assertEquals(3, $card['step']);
+        $this->assertEquals($ease, $card['ease']);
+    }
 }
