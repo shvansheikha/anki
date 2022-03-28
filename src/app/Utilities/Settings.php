@@ -13,6 +13,7 @@ class Settings
     public static $DEFAULT_STARTING_EASE = 2.5;
 
     public static $INTERVAL_MODIFIER = 1;
+    public static $MINIMUM_EASE = 1.3;
 
     public static $FIRST_STEP_INTERVAL = ['again' => 60, 'hard' => 360, 'good' => 600, 'easy' => 345600];
     public static $SECOND_STEP_INTERVAL = ['again' => 60, 'hard' => 600, 'good' => 86400, 'easy' => 345600];
