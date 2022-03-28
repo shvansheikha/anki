@@ -2,9 +2,11 @@
 
 namespace Jackwestin\AnkiSandbox\Tests\Unit;
 
+use Jackwestin\AnkiSandbox\app\Enums\CardStatus;
 use Jackwestin\AnkiSandbox\app\Service\SM2;
 use Jackwestin\AnkiSandbox\app\Utilities\Settings;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class AnkiTest extends TestCase
 {
@@ -27,15 +29,18 @@ class AnkiTest extends TestCase
 
     private function makeCard($new = true, $interval = 0, $step = 0, $ease = 0)
     {
-        return [
-            "id" => 1,
-            "title" => "card 1",
-            "answer" => "",
-            "new" => $new,
-            "ease" => $ease,
-            "interval" => $interval,
-            "step" => $step
-        ];
+        $card = new stdClass();
+
+        $card->id = 1;
+        $card->title = "card 1";
+        $card->answer = "";
+        $card->new = $new;
+        $card->ease = $ease;
+        $card->interval = $interval;
+        $card->step = $step;
+        $card->status = CardStatus::LEARNING;
+
+        return $card;
     }
 
     /** @test */
@@ -45,7 +50,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, "again");
 
-        $this->assertFalse($card['new']);
+        $this->assertFalse($card->new);
     }
 
     /** @test */
@@ -55,7 +60,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, "good");
 
-        $this->assertEquals($card['step'], 1);
+        $this->assertEquals($card->step, 1);
     }
 
     /** @test */
@@ -65,7 +70,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, "easy");
 
-        $this->assertEquals($card['step'], 2);
+        $this->assertEquals($card->step, 2);
     }
 
     /** @test */
@@ -75,7 +80,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, "easy");
 
-        $this->assertEquals($card['step'], 3);
+        $this->assertEquals($card->step, 3);
     }
 
     /** @test */
@@ -87,8 +92,8 @@ class AnkiTest extends TestCase
         $card = $this->sm2->cardAnswer($card, 'again');
 
         $ivl = $this->interval['1d'] / 2;
-        $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals($ease - Settings::$AGAIN_EASE, $card['ease']);
+        $this->assertEquals($ivl, $card->interval);
+        $this->assertEquals($ease - Settings::$AGAIN_EASE, $card->ease);
     }
 
     /** @test */
@@ -99,10 +104,10 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'hard');
 
-        $ivl = $this->interval['1d'] * Settings::$HARD_EASE * Settings::$INTERVAL_MODIFIRE;
-        $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals(2, $card['step']);
-        $this->assertEquals($ease - Settings::$HARD_SUB_EASE, $card['ease']);
+        $ivl = $this->interval['1d'] * Settings::$HARD_EASE * Settings::$INTERVAL_MODIFIER;
+        $this->assertEquals($ivl, $card->interval);
+        $this->assertEquals(2, $card->step);
+        $this->assertEquals($ease - Settings::$HARD_SUB_EASE, $card->ease);
     }
 
     /** @test */
@@ -113,10 +118,10 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'good');
 
-        $ivl = $this->interval['1d'] * $ease * Settings::$INTERVAL_MODIFIRE;
-        $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals(3, $card['step']);
-        $this->assertEquals($ease, $card['ease']);
+        $ivl = $this->interval['1d'] * $ease * Settings::$INTERVAL_MODIFIER;
+        $this->assertEquals($ivl, $card->interval);
+        $this->assertEquals(3, $card->step);
+        $this->assertEquals($ease, $card->ease);
     }
 
     /** @test */
@@ -127,9 +132,22 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'easy');
 
-        $ivl = $this->interval['1d'] * $ease * Settings::$INTERVAL_MODIFIRE * Settings::$DEFAULT_EASY_BONUS;
-        $this->assertEquals($ivl, $card['interval']);
-        $this->assertEquals(3, $card['step']);
-        $this->assertEquals($ease + Settings::$EASY_EASE, $card['ease']);
+        $ivl = $this->interval['1d'] * $ease * Settings::$INTERVAL_MODIFIER * Settings::$DEFAULT_EASY_BONUS;
+        $this->assertEquals($ivl, $card->interval);
+        $this->assertEquals(3, $card->step);
+        $this->assertEquals($ease + Settings::$EASY_EASE, $card->ease);
     }
+
+    /** @test */
+    public function it_()
+    {
+        var_dump($this->minutes_to_days(1440));
+
+    }
+
+    private function minutes_to_days($minutes)
+    {
+        return $minutes / (60 * 24);
+}
+
 }

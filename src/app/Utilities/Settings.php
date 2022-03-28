@@ -17,4 +17,6 @@ class Settings
 
     public static $FIRST_STEP_INTERVAL = ['again' => 60, 'hard' => 360, 'good' => 600, 'easy' => 345600];
     public static $SECOND_STEP_INTERVAL = ['again' => 60, 'hard' => 600, 'good' => 86400, 'easy' => 345600];
+
+    public static $VALID_ANSWER = ['again', 'hard', 'good', 'easy'];
 }

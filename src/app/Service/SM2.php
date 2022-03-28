@@ -2,18 +2,24 @@
 
 namespace Jackwestin\AnkiSandbox\app\Service;
 
+use ErrorException;
 use Jackwestin\AnkiSandbox\app\Utilities\Settings;
 
 class SM2
 {
     public function cardAnswer($card, $answer)
     {
-        $step = $card['step'];
+        if (!in_array($answer, Settings::$VALID_ANSWER)) {
+            throw new ErrorException('answer is not valid.');
+        }
+
+        $step = $card->step;
 
         if ($this->isFirstStep($card)) {
 
             $newInterval = Settings::$FIRST_STEP_INTERVAL[$answer];
             $newEase = Settings::$DEFAULT_STARTING_EASE;
+            $step = 0;
 
             if ($answer == "good") {
                 $step = 1;
@@ -23,9 +29,9 @@ class SM2
                 $step = 2;
             }
 
-        } elseif ($this->isSecondStep($card['step'])) {
+        } elseif ($this->isSecondStep($card->step)) {
             $newInterval = Settings::$SECOND_STEP_INTERVAL[$answer];
-            $newEase = $card['ease'];
+            $newEase = $card->ease;
 
             if (in_array($answer, ['good', 'easy'])) {
                 $step++;
@@ -34,19 +40,19 @@ class SM2
             list($newInterval, $newEase, $step) = $this->calculate($card, $answer);
         }
 
-        $card['new'] = false;
-        $card['interval'] = $newInterval;
-        $card['ease'] = $newEase;
-        $card['step'] = $step;
+        $card->new = false;
+        $card->interval = $newInterval;
+        $card->ease = $newEase;
+        $card->step = $step;
 
         return $card;
     }
 
     private function calculate($card, $answer): array
     {
-        $currentInterval = $card['interval'];
-        $currentEase = $card['ease'];
-        $step = $card['step'];
+        $currentInterval = $card->interval;
+        $currentEase = $card->ease;
+        $step = $card->step;
 
         switch ($answer) {
             case "again":
@@ -80,7 +86,7 @@ class SM2
 
     private function isFirstStep($card): bool
     {
-        return $card['new'] || ($card['step'] == 0);
+        return $card->new || ($card->step == 0);
     }
 
     private function isSecondStep($step): bool
