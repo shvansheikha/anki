@@ -41,7 +41,7 @@ class SM2
         }
 
         $card->new = false;
-        $card->interval = $newInterval;
+        $card->interval = round($newInterval);
         $card->ease = $newEase;
         $card->step = $step;
 
