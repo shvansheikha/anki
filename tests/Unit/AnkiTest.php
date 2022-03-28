@@ -99,7 +99,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'hard');
 
-        $ivl = $this->interval['1d'] * (Settings::$HARD_EASE / 100) * 1;
+        $ivl = $this->interval['1d'] * Settings::$HARD_EASE * 1;
         $this->assertEquals($ivl, $card['interval']);
         $this->assertEquals(2, $card['step']);
         $this->assertEquals($ease - 15, $card['ease']);
@@ -113,7 +113,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'good');
 
-        $ivl = $this->interval['1d'] * ($ease / 100) * 1;
+        $ivl = $this->interval['1d'] * $ease * 1;
         $this->assertEquals($ivl, $card['interval']);
         $this->assertEquals(3, $card['step']);
         $this->assertEquals($ease, $card['ease']);
@@ -127,7 +127,7 @@ class AnkiTest extends TestCase
 
         $card = $this->sm2->cardAnswer($card, 'easy');
 
-        $ivl = $this->interval['1d'] * ($ease / 100) * 1 * (Settings::$DEFAULT_EASY_BONUS / 100);
+        $ivl = $this->interval['1d'] * $ease / 100 * 1 * Settings::$DEFAULT_EASY_BONUS;
         $this->assertEquals($ivl, $card['interval']);
         $this->assertEquals(3, $card['step']);
         $this->assertEquals($ease + Settings::$EASY_EASE, $card['ease']);
