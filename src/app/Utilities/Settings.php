@@ -7,6 +7,7 @@ class Settings
     public static $AGAIN_EASE = 0.20;
     public static $HARD_EASE = 1.2;
     public static $EASY_EASE = 0.15;
+    public static $HARD_SUB_EASE = 0.15;
 
     public static $DEFAULT_EASY_BONUS = 1.3;
     public static $DEFAULT_STARTING_EASE = 2.5;

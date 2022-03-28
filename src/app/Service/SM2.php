@@ -56,7 +56,7 @@ class SM2
                 break;
             case "hard":
                 $newInterval = $currentInterval * Settings::$HARD_EASE * Settings::$INTERVAL_MODIFIRE;
-                $newEase = $currentEase - 15;
+                $newEase = $currentEase - Settings::$HARD_SUB_EASE;
                 break;
             case "good":
                 $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIRE;
