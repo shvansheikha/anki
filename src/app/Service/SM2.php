@@ -55,16 +55,16 @@ class SM2
                 $step--;
                 break;
             case "hard":
-                $newInterval = $currentInterval * (Settings::$HARD_EASE / 100) * 1;
+                $newInterval = $currentInterval * Settings::$HARD_EASE * Settings::$INTERVAL_MODIFIRE;
                 $newEase = $currentEase - 15;
                 break;
             case "good":
-                $newInterval = $currentInterval * ($currentEase / 100) * 1;
+                $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIRE;
                 $newEase = $currentEase;
                 $step++;
                 break;
             case "easy":
-                $newInterval = $currentInterval * ($currentEase / 100) * 1 * (Settings::$DEFAULT_EASY_BONUS / 100);
+                $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIRE * Settings::$DEFAULT_EASY_BONUS;
                 $newEase = $currentEase + Settings::$EASY_EASE;
                 $step++;
                 break;
@@ -74,7 +74,7 @@ class SM2
                 break;
         }
 
-        $newEase = $newEase < 130 ? 130 : $newEase; // should not fall below the value of 1.3
+        $newEase = $newEase < 1.3 ? 1.3 : $newEase; // should not fall below the value of 1.3
         return [$newInterval, $newEase, $step];
     }
 
