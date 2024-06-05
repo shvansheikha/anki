@@ -83,10 +83,7 @@ class SM2
                 break;
         }
 
-        $newEase =
-            $newEase < Settings::$MINIMUM_EASE
-                ? Settings::$MINIMUM_EASE
-                : $newEase;
+        $newEase = max($newEase, Settings::$MINIMUM_EASE);
         return [$newInterval, $newEase, $step];
     }
 
