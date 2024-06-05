@@ -10,9 +10,9 @@ use stdClass;
 
 class AnkiTest extends TestCase
 {
-    private $sm2;
+    private SM2 $sm2;
 
-    private $interval = [
+    private array $interval = [
         '1m' => 60,
         '6m' => 360,
         '10m' => 600,
@@ -27,7 +27,7 @@ class AnkiTest extends TestCase
         $this->sm2 = new SM2();
     }
 
-    private function makeCard($new = true, $interval = 0, $step = 0, $ease = 0)
+    private function makeCard($new = true, $interval = 0, $step = 0, $ease = 0, $status = CardStatus::LEARNING): stdClass
     {
         $card = new stdClass();
 
@@ -38,7 +38,7 @@ class AnkiTest extends TestCase
         $card->ease = $ease;
         $card->interval = $interval;
         $card->step = $step;
-        $card->status = CardStatus::LEARNING;
+        $card->status = $status;
 
         return $card;
     }
@@ -137,17 +137,4 @@ class AnkiTest extends TestCase
         $this->assertEquals(3, $card->step);
         $this->assertEquals($ease + Settings::$EASY_EASE, $card->ease);
     }
-
-    /** @test */
-    public function it_()
-    {
-        var_dump($this->minutes_to_days(1440));
-
-    }
-
-    private function minutes_to_days($minutes)
-    {
-        return $minutes / (60 * 24);
-}
-
 }

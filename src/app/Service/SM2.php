@@ -19,15 +19,7 @@ class SM2
 
             $newInterval = Settings::$FIRST_STEP_INTERVAL[$answer];
             $newEase = Settings::$DEFAULT_STARTING_EASE;
-            $step = 0;
-
-            if ($answer == "good") {
-                $step = 1;
-            }
-
-            if ($answer == "easy") {
-                $step = 2;
-            }
+            $step = Settings::$LEARNING_STEPS[$answer];
 
         } elseif ($this->isSecondStep($card->step)) {
             $newInterval = Settings::$SECOND_STEP_INTERVAL[$answer];
