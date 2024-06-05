@@ -1,5 +1,5 @@
 {
-  "name": "jackwestin/anki-sandbox",
+  "name": "shvan/anki-sandbox",
   "type": "library",
   "minimum-stability": "dev",
   "require": {
@@ -10,12 +10,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Jackwestin\\AnkiSandbox\\": "src/"
+      "Shvan\\AnkiSandbox\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Jackwestin\\AnkiSandbox\\Tests\\": "tests/"
+      "Shvan\\AnkiSandbox\\Tests\\": "tests/"
     }
   }
 }

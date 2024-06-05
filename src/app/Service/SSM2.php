@@ -1,24 +1,27 @@
 <?php
 
-namespace Jackwestin\AnkiSandbox\app\Service;
+namespace Shvan\AnkiSandbox\app\Service;
 
 use ErrorException;
-use Jackwestin\AnkiSandbox\app\Enums\CardStatus;
-use Jackwestin\AnkiSandbox\app\Utilities\SecondSettings;
-use Jackwestin\AnkiSandbox\app\Utilities\Settings;
+use Shvan\AnkiSandbox\app\Enums\CardStatus;
+use Shvan\AnkiSandbox\app\Utilities\SecondSettings;
+use Shvan\AnkiSandbox\app\Utilities\Settings;
 
 class SSM2
 {
     public function cardAnswer($card, $answer)
     {
         if (!in_array($answer, SecondSettings::$VALID_ANSWER)) {
-            throw new ErrorException('answer is not valid.');
+            throw new ErrorException("answer is not valid.");
         }
 
         $step = $card->step;
         switch ($card->status) {
             case CardStatus::LEARNING:
-                list($step, $status, $interval) = $this->learningCalculations($card, $answer);
+                list($step, $status, $interval) = $this->learningCalculations(
+                    $card,
+                    $answer
+                );
                 break;
 
             case CardStatus::LEARNED:
@@ -26,10 +29,13 @@ class SSM2
                 break;
 
             case CardStatus::RELEARNING:
-                list($interval, $newEase, $step) = $this->calculate($card, $answer);
+                list($interval, $newEase, $step) = $this->calculate(
+                    $card,
+                    $answer
+                );
                 break;
             default:
-                throw new ErrorException('status is not valid!');
+                throw new ErrorException("status is not valid!");
         }
 
         $card->new = false;
@@ -86,21 +92,34 @@ class SSM2
                 $status = CardStatus::RELEARNING;
                 $step = 0;
                 $ease = max(130, $ease - 20);
-                $interval = max(SecondSettings::$MINIMUM_INTERVAL, $interval * SecondSettings::$NEW_INTERVAL / 100);
+                $interval = max(
+                    SecondSettings::$MINIMUM_INTERVAL,
+                    ($interval * SecondSettings::$NEW_INTERVAL) / 100
+                );
                 return SecondSettings::$LAPSES_STEPS[0];
                 break;
             case "hard":
                 $ease = max(130, $ease - 15);
-                $interval = $interval * 1.2 * SecondSettings::$INTERVAL_MODIFIER / 100;
+                $interval =
+                    ($interval * 1.2 * SecondSettings::$INTERVAL_MODIFIER) /
+                    100;
                 $interval = min(SecondSettings::$MAXIMUM_INTERVAL, $interval);
                 break;
             case "good":
-                $interval = ($interval * $ease / 100 * SecondSettings::$INTERVAL_MODIFIER / 100);
-                $interval=  min(SecondSettings::$MAXIMUM_INTERVAL, $interval);
+                $interval =
+                    ((($interval * $ease) / 100) *
+                        SecondSettings::$INTERVAL_MODIFIER) /
+                    100;
+                $interval = min(SecondSettings::$MAXIMUM_INTERVAL, $interval);
                 break;
             case "easy":
                 $ease += 15;
-                $interval = ($interval * $ease / 100 * SecondSettings::$INTERVAL_MODIFIER / 100 * SecondSettings::$EASY_BONUS / 100);
+                $interval =
+                    ((((($interval * $ease) / 100) *
+                        SecondSettings::$INTERVAL_MODIFIER) /
+                        100) *
+                        SecondSettings::$EASY_BONUS) /
+                    100;
                 $interval = min(SecondSettings::$MAXIMUM_INTERVAL, $interval);
                 break;
         }
@@ -121,16 +140,26 @@ class SSM2
                 $step--;
                 break;
             case "hard":
-                $newInterval = $currentInterval * Settings::$HARD_EASE * Settings::$INTERVAL_MODIFIER;
+                $newInterval =
+                    $currentInterval *
+                    Settings::$HARD_EASE *
+                    Settings::$INTERVAL_MODIFIER;
                 $newEase = $currentEase - Settings::$HARD_SUB_EASE;
                 break;
             case "good":
-                $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIER;
+                $newInterval =
+                    $currentInterval *
+                    $currentEase *
+                    Settings::$INTERVAL_MODIFIER;
                 $newEase = $currentEase;
                 $step++;
                 break;
             case "easy":
-                $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIER * Settings::$DEFAULT_EASY_BONUS;
+                $newInterval =
+                    $currentInterval *
+                    $currentEase *
+                    Settings::$INTERVAL_MODIFIER *
+                    Settings::$DEFAULT_EASY_BONUS;
                 $newEase = $currentEase + Settings::$EASY_EASE;
                 $step++;
                 break;
@@ -140,7 +169,10 @@ class SSM2
                 break;
         }
 
-        $newEase = $newEase < Settings::$MINIMUM_EASE ? Settings::$MINIMUM_EASE : $newEase;
+        $newEase =
+            $newEase < Settings::$MINIMUM_EASE
+                ? Settings::$MINIMUM_EASE
+                : $newEase;
         return [$newInterval, $newEase, $step];
     }
 }

@@ -1,35 +1,36 @@
 <?php
 
-namespace Jackwestin\AnkiSandbox\app\Service;
+namespace Shvan\AnkiSandbox\app\Service;
 
 use ErrorException;
-use Jackwestin\AnkiSandbox\app\Utilities\Settings;
+use Shvan\AnkiSandbox\app\Utilities\Settings;
 
 class SM2
 {
     public function cardAnswer($card, $answer)
     {
         if (!in_array($answer, Settings::$VALID_ANSWER)) {
-            throw new ErrorException('answer is not valid.');
+            throw new ErrorException("answer is not valid.");
         }
 
         $step = $card->step;
 
         if ($this->isFirstStep($card)) {
-
             $newInterval = Settings::$FIRST_STEP_INTERVAL[$answer];
             $newEase = Settings::$DEFAULT_STARTING_EASE;
             $step = Settings::$LEARNING_STEPS[$answer];
-
         } elseif ($this->isSecondStep($card->step)) {
             $newInterval = Settings::$SECOND_STEP_INTERVAL[$answer];
             $newEase = $card->ease;
 
-            if (in_array($answer, ['good', 'easy'])) {
+            if (in_array($answer, ["good", "easy"])) {
                 $step++;
             }
         } else {
-            list($newInterval, $newEase, $step) = $this->calculate($card, $answer);
+            list($newInterval, $newEase, $step) = $this->calculate(
+                $card,
+                $answer
+            );
         }
 
         $card->new = false;
@@ -53,16 +54,26 @@ class SM2
                 $step--;
                 break;
             case "hard":
-                $newInterval = $currentInterval * Settings::$HARD_EASE * Settings::$INTERVAL_MODIFIER;
+                $newInterval =
+                    $currentInterval *
+                    Settings::$HARD_EASE *
+                    Settings::$INTERVAL_MODIFIER;
                 $newEase = $currentEase - Settings::$HARD_SUB_EASE;
                 break;
             case "good":
-                $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIER;
+                $newInterval =
+                    $currentInterval *
+                    $currentEase *
+                    Settings::$INTERVAL_MODIFIER;
                 $newEase = $currentEase;
                 $step++;
                 break;
             case "easy":
-                $newInterval = $currentInterval * $currentEase * Settings::$INTERVAL_MODIFIER * Settings::$DEFAULT_EASY_BONUS;
+                $newInterval =
+                    $currentInterval *
+                    $currentEase *
+                    Settings::$INTERVAL_MODIFIER *
+                    Settings::$DEFAULT_EASY_BONUS;
                 $newEase = $currentEase + Settings::$EASY_EASE;
                 $step++;
                 break;
@@ -72,13 +83,16 @@ class SM2
                 break;
         }
 
-        $newEase = $newEase < Settings::$MINIMUM_EASE ? Settings::$MINIMUM_EASE : $newEase;
+        $newEase =
+            $newEase < Settings::$MINIMUM_EASE
+                ? Settings::$MINIMUM_EASE
+                : $newEase;
         return [$newInterval, $newEase, $step];
     }
 
     private function isFirstStep($card): bool
     {
-        return $card->new || ($card->step == 0);
+        return $card->new || $card->step == 0;
     }
 
     private function isSecondStep($step): bool

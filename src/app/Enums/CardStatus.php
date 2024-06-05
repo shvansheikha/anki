@@ -1,6 +1,6 @@
 <?php
 
-namespace Jackwestin\AnkiSandbox\app\Enums;
+namespace Shvan\AnkiSandbox\app\Enums;
 
 abstract class CardStatus
 {

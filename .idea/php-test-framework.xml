@@ -6,6 +6,7 @@
         <cache>
           <versions>
             <info id="Local" version="9.5.19" />
+            <info id="Local/Volumes/one/web/anki-sandbox/vendor/autoload.php" version="9.6.19" />
           </versions>
         </cache>
       </tool>
